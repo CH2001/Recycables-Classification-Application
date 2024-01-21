@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Prediction</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+
+        #uploadForm {
+            margin-bottom: 20px;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+
+        img {
+            max-width: 100%;
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+
+<body>
+    <h1>Recycables classification</h1>
+
+    <p>Upload an image to get a prediction of its trash category. Know whether it is Box, Glass Bottle,  Soda Can, Crushed Soda Can or Plastic Bottle!</p>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*" required>
+        <button type="button" onclick="uploadFile()">Upload</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script>
+        function uploadFile() {
+            var formData = new FormData($('#uploadForm')[0]);
+
+            $.ajax({
+                url: '/upload',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    $('#result').html('<br> <br> <p>Results</p>');
+                    $('#result').append('<img src="/uploads/' + response.img_name + '" alt="Uploaded Image" style="width: 300px">');
+                    $('#result').append('<p>Predicted Category: ' + response.predicted_category + '</p>');
+                    
+                    if (response.back_to_home_button) {
+                        $('#result').append('<br> <button onclick="goToHomePage()">Reset</button>');
+                    }
+                },
+                error: function(error) {
+                    $('#result').html('<p>Error: ' + error.responseJSON.error + '</p>');
+                }
+            });
+        }
+
+        function goToHomePage() {
+            window.location.href = '/';
+        }
+        
+    </script>
+
+
+</body>
+</html>
